@@ -1,36 +1,43 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 import { RoleModule } from './role/role.module';
+import { AuthModule } from './auth/auth.module';
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
-import { AuthModule } from './auth/auth.module';
-
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      entities: [User, Role],
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'tabo022124',
-      database: 'baseDatosCQGestionHumana',
-      autoLoadEntities: true,
-      synchronize: false, // Desactiva esto en producción
+    ConfigModule.forRoot({ isGlobal: true }),
+
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql',
+        host: config.get<string>('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get<string>('DB_USERNAME'),
+        password: config.get<string>('DB_PASSWORD'),
+        database: config.get<string>('DB_NAME'),
+        entities: [User, Role],
+        autoLoadEntities: true,
+        synchronize: false,
+      }),
     }),
+
     UsersModule,
     RoleModule,
-    AuthModule],
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-
   constructor(private dataSource: DataSource) {}
   async onModuleInit() {
     try {
