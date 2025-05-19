@@ -9,6 +9,10 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
 import { DataSource } from 'typeorm';
+import { CandidateModule } from './candidate/candidate.module';
+import { CandidateStatusModule } from './candidate-status/candidate-status.module';
+import { Candidate } from './candidate/entities/candidate.entity';
+import { CandidateStatus } from './candidate-status/entities/candidate-status.entity';
 
 @Module({
   imports: [
@@ -20,7 +24,7 @@ import { DataSource } from 'typeorm';
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
-        entities: [User, Role],
+        entities: [User, Role, Candidate, CandidateStatus],
         autoLoadEntities: true,
         synchronize: false,
         ssl: { rejectUnauthorized: false },
@@ -30,6 +34,8 @@ import { DataSource } from 'typeorm';
     UsersModule,
     RoleModule,
     AuthModule,
+    CandidateModule,
+    CandidateStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],
