@@ -12,28 +12,28 @@ export class UsersService {
     private userRepo: Repository<User>,
   ) {}
 
-  create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto) {
     const user = this.userRepo.create(dto);
     return this.userRepo.save(user);
   }
 
-  findAll() {
+  async findAll() {
     return this.userRepo.find({ relations: ['role'] });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return this.userRepo.findOne({ where: { id_user: id }, relations: ['role'] });
   }
 
-  update(id: number, dto: UpdateUserDto) {
+  async update(id: number, dto: UpdateUserDto) {
     return this.userRepo.update({ id_user: id }, dto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return this.userRepo.delete({ id_user: id });
   }
 
-  findByEmail(email: string) {
+  async findByEmail(email: string) {
     return this.userRepo.findOne({ where: { email }, relations: ['role'] });
   }
 }

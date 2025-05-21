@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Role } from 'src/role/entities/role.entity';
 
-@Entity()
+@Entity('app_user')
 export class User {
+  
   @PrimaryGeneratedColumn()
   id_user: number;
 
@@ -11,6 +12,9 @@ export class User {
 
   @Column({ length: 100 })
   password: string;
+
+  @Column({ name: 'id_role' })
+  id_role: number;
 
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'id_role' })
