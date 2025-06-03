@@ -1,22 +1,20 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
 
-  @Post('register')
-  async register(@Body() body: { email: string; password: string; id_role: number }) {
-    return this.authService.register(body.email, body.password, body.id_role);
-  }
+    constructor(
+        private readonly authService: AuthService) {}
 
-
-  @Post('login')
-  async login(@Body() body: { email: string; password: string }) {
-    const user = await this.authService.validateUser(body.email, body.password);
-    if (!user) {
-      return { message: 'Credencialees incorrectas' };
+    @Post('register')
+    async register(@Body() createUserDto: CreateUserDto) { 
+        return this.authService.register(createUserDto);
     }
-    return { message: 'Login exitoso', user }; 
-  }
+
+    @Post('login')
+    async login() {
+        return this.authService.login();
+    }
 }

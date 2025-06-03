@@ -9,31 +9,34 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepo: Repository<User>,
+    private readonly userRepo: Repository<User>,
   ) {}
 
-  async create(dto: CreateUserDto) {
-    const user = this.userRepo.create(dto);
-    return this.userRepo.save(user);
+  create(createUserDto: CreateUserDto) {
+    return this.userRepo.save(createUserDto);
   }
 
-  async findAll() {
+  findByOneEmail(email: string) {
+    return this.userRepo.findOneBy({ email });
+  }
+
+  findAll() {
     return this.userRepo.find({ relations: ['role'] });
   }
 
-  async findOne(id: number) {
+  findOne(id: number) {
     return this.userRepo.findOne({ where: { id_user: id }, relations: ['role'] });
   }
 
-  async update(id: number, dto: UpdateUserDto) {
+  update(id: number, dto: UpdateUserDto) {
     return this.userRepo.update({ id_user: id }, dto);
   }
 
-  async remove(id: number) {
+  remove(id: number) {
     return this.userRepo.delete({ id_user: id });
   }
 
-  async findByEmail(email: string) {
+  findByEmail(email: string) {
     return this.userRepo.findOne({ where: { email }, relations: ['role'] });
   }
 }
