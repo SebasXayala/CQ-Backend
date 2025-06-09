@@ -29,8 +29,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload) {
     // Buscar usuario en la base de datos y validar el rol
     const user = await this.usersService.findOne(payload.sub);
-    if (!user || user.id_role !== 2) {
-      throw new UnauthorizedException('No autorizado: solo usuarios con role=2');
+    if (!user || user.id_role !== 1) {
+      throw new UnauthorizedException('No autorizado: solo usuarios con role de administrador pueden acceder a esta ruta');
     }
     return { userId: user.id_user, email: user.email, role: user.id_role };
   }
