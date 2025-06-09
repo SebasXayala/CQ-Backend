@@ -9,12 +9,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private userRepo: Repository<User>,
+    private readonly userRepo: Repository<User>,
   ) {}
 
-  create(dto: CreateUserDto) {
-    const user = this.userRepo.create(dto);
-    return this.userRepo.save(user);
+  create(createUserDto: CreateUserDto) {
+    return this.userRepo.save(createUserDto);
+  }
+
+  findByOneEmail(email: string) {
+    return this.userRepo.findOneBy({ email });
   }
 
   findAll() {

@@ -4,11 +4,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { RoleModule } from './role/role.module';
+import { RoleModule } from './role/roles.module';
 import { AuthModule } from './auth/auth.module';
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
 import { DataSource } from 'typeorm';
+import { CandidateModule } from './candidate/candidate.module';
+import { CandidateStatusModule } from './candidate-status/candidate-status.module';
+import { Candidate } from './candidate/entities/candidate.entity';
+import { CandidateStatus } from './candidate-status/entities/candidate-status.entity';
 
 @Module({
   imports: [
@@ -18,21 +22,20 @@ import { DataSource } from 'typeorm';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'mysql',
-        host: config.get<string>('DB_HOST'),
-        port: config.get<number>('DB_PORT'),
-        username: config.get<string>('DB_USERNAME'),
-        password: config.get<string>('DB_PASSWORD'),
-        database: config.get<string>('DB_NAME'),
-        entities: [User, Role],
+        type: 'postgres',
+        url: config.get<string>('DATABASE_URL'),
+        entities: [User, Role, Candidate, CandidateStatus],
         autoLoadEntities: true,
         synchronize: false,
+        ssl: { rejectUnauthorized: false },
       }),
     }),
 
     UsersModule,
     RoleModule,
     AuthModule,
+    CandidateModule,
+    CandidateStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],
