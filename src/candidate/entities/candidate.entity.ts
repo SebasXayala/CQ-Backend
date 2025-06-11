@@ -1,24 +1,34 @@
+import { Position } from 'src/position/entities/position.entity';
+import { Profile } from 'src/profile/entities/profile.entity';
+import { CandidateStatus } from 'src/candidate_status/entities/candidate_status.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { CandidateStatus } from '../../candidate-status/entities/candidate-status.entity';
 
-@Entity()
+
+
+@Entity('candidate')
 export class Candidate {
-  @PrimaryGeneratedColumn()
-  id_candidate: number;
 
-  @Column({ length: 20 })
-  name: string;
+    @PrimaryGeneratedColumn()
+    id_candidate: number;
 
-  @Column({ length: 10 })
-  identifier: string;
+    @Column({ length: 20 })
+    name: string;
 
-  @Column({ length: 20 })
-  identifier_type: string;
+    @Column({ length: 10 })
+    identifier: string;
 
-  @Column({ length: 20 })
-  profile: string;
+    @Column({ length: 20 })
+    identifier_type: string;
 
-  @ManyToOne(() => CandidateStatus)
-  @JoinColumn({ name: 'id_candidate_status' })
-  candidate_status: CandidateStatus;
+    @ManyToOne(() => Profile, (profile) => profile.candidates)
+    @JoinColumn({ name: 'id_profile' })
+    profile: Profile;
+
+    @ManyToOne(() => CandidateStatus, (candidate_status) => candidate_status.candidates)
+    @JoinColumn({ name: 'id_candidate_status' })
+    candidate_status: CandidateStatus;
+
+    @ManyToOne(() => Position, (position) => position.candidates)
+    @JoinColumn({ name: 'id_position' })
+    position: Position;
 }

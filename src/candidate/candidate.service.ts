@@ -1,32 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Candidate } from './entities/candidate.entity';
+import { CreateCandidateDto } from './dto/create-candidate.dto';
+import { UpdateCandidateDto } from './dto/update-candidate.dto';
 
 @Injectable()
 export class CandidateService {
-  constructor(
-    @InjectRepository(Candidate)
-    private candidateRepository: Repository<Candidate>,
-  ) {}
-
-  create(candidate: Partial<Candidate>) {
-    return this.candidateRepository.save(candidate);
+  create(createCandidateDto: CreateCandidateDto) {
+    return 'This action adds a new candidate';
   }
 
   findAll() {
-    return this.candidateRepository.find({ relations: ['candidate_status'] });
+    return `This action returns all candidate`;
   }
 
   findOne(id: number) {
-    return this.candidateRepository.findOne({ where: { id_candidate: id }, relations: ['candidate_status'] });
+    return `This action returns a #${id} candidate`;
   }
 
-  update(id: number, updateData: Partial<Candidate>) {
-    return this.candidateRepository.update(id, updateData);
+  update(id: number, updateCandidateDto: UpdateCandidateDto) {
+    return `This action updates a #${id} candidate`;
   }
 
   remove(id: number) {
-    return this.candidateRepository.delete(id);
+    return `This action removes a #${id} candidate`;
   }
 }

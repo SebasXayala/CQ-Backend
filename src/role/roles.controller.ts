@@ -7,7 +7,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @Controller('roles')
 @UseGuards(JwtAuthGuard)
 export class RoleController {
-  constructor(private readonly RolesService: RolesService) {}
+  constructor(private readonly RolesService: RolesService) { }
 
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {

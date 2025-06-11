@@ -1,16 +1,15 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { CandidateService } from './candidate.service';
-import { Candidate } from './entities/candidate.entity';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateCandidateDto } from './dto/create-candidate.dto';
+import { UpdateCandidateDto } from './dto/update-candidate.dto';
 
 @Controller('candidate')
-@UseGuards(JwtAuthGuard)
 export class CandidateController {
   constructor(private readonly candidateService: CandidateService) {}
 
   @Post()
-  create(@Body() candidate: Partial<Candidate>) {
-    return this.candidateService.create(candidate);
+  create(@Body() createCandidateDto: CreateCandidateDto) {
+    return this.candidateService.create(createCandidateDto);
   }
 
   @Get()
@@ -19,17 +18,17 @@ export class CandidateController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.candidateService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.candidateService.findOne(+id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: number, @Body() updateData: Partial<Candidate>) {
-    return this.candidateService.update(id, updateData);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCandidateDto: UpdateCandidateDto) {
+    return this.candidateService.update(+id, updateCandidateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.candidateService.remove(id);
+  remove(@Param('id') id: string) {
+    return this.candidateService.remove(+id);
   }
 }

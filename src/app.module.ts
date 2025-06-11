@@ -1,18 +1,27 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DataSource } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AppController } from './app.controller';
+/* Import Module */
 import { UsersModule } from './users/users.module';
 import { RoleModule } from './role/roles.module';
 import { AuthModule } from './auth/auth.module';
+import { CandidateModule } from './candidate/candidate.module';
+import { ProfileModule } from './profile/profile.module';
+import { PositionModule } from './position/position.module';
+import { SelectionProcessModule } from './selection_process/selection_process.module';
+import { CandidateStatusModule } from './candidate_status/candidate_status.module';
+/* Import Entity */
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
-import { DataSource } from 'typeorm';
-import { CandidateModule } from './candidate/candidate.module';
-import { CandidateStatusModule } from './candidate-status/candidate-status.module';
 import { Candidate } from './candidate/entities/candidate.entity';
-import { CandidateStatus } from './candidate-status/entities/candidate-status.entity';
+import { CandidateStatus } from './candidate_status/entities/candidate_status.entity';
+import { Profile } from './profile/entities/profile.entity';
+import { Position } from './position/entities/position.entity';
+import { SelectionProcess } from './selection_process/entities/selection_process.entity';
+
 
 @Module({
   imports: [
@@ -24,7 +33,7 @@ import { CandidateStatus } from './candidate-status/entities/candidate-status.en
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
-        entities: [User, Role, Candidate, CandidateStatus],
+        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess],
         autoLoadEntities: true,
         synchronize: false,
         ssl: { rejectUnauthorized: false },
@@ -36,6 +45,9 @@ import { CandidateStatus } from './candidate-status/entities/candidate-status.en
     AuthModule,
     CandidateModule,
     CandidateStatusModule,
+    SelectionProcessModule,
+    PositionModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
