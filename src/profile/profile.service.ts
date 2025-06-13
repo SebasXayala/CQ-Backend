@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,9 +10,13 @@ export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-  ) {}
+  ) { }
 
   async create(createProfileDto: CreateProfileDto) {
+    const exists = await this.profileRepository.findOneBy({ name: (createProfileDto as any).name });
+    if (exists) {
+      throw new ConflictException('Ya existe un perfil con ese nombre');
+    }
     const profile = this.profileRepository.create(createProfileDto);
     return this.profileRepository.save(profile);
   }
@@ -22,20 +26,51 @@ export class ProfileService {
   }
 
   async findOne(id: number): Promise<Profile> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('El id debe ser un número entero positivo');
+    }
     const profile = await this.profileRepository.findOneBy({ id_profile: id });
     if (!profile) {
-      throw new NotFoundException(`Profile with id ${id} not found`);
+      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
     }
     return profile;
   }
 
   async update(id: number, updateProfileDto: UpdateProfileDto): Promise<Profile> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('El id debe ser un número entero positivo');
+    }
+    const profile = await this.profileRepository.findOneBy({ id_profile: id });
+    if (!profile) {
+      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+    }
+    // Validar unicidad si se actualiza el nombre
+    if (updateProfileDto.name && updateProfileDto.name !== profile.name) {
+      const exists = await this.profileRepository.findOneBy({ name: updateProfileDto.name });
+      if (exists) {
+        throw new ConflictException('Ya existe un perfil con ese nombre');
+      }
+    }
     await this.profileRepository.update(id, updateProfileDto);
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<Profile> {
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new BadRequestException('El id debe ser un número entero positivo');
+    }
+    const profile = await this.profileRepository.findOne({
+      where: { id_profile: id },
+      relations: ['candidates'],
+    });
+    if (!profile) {
+      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+    }
+    if (profile.candidates && profile.candidates.length > 0) {
+      throw new ConflictException('No se puede eliminar el Perfil porque tiene candidatos asociados');
+    }
     const result = await this.profileRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException('Profile not found');
+    if (result.affected === 0) throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+    return profile;
   }
 }

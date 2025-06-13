@@ -1,7 +1,8 @@
 import { Position } from 'src/position/entities/position.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
 import { CandidateStatus } from 'src/candidate_status/entities/candidate_status.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { SelectionProcess } from 'src/selection_process/entities/selection_process.entity';
 
 
 
@@ -31,4 +32,8 @@ export class Candidate {
     @ManyToOne(() => Position, (position) => position.candidates)
     @JoinColumn({ name: 'id_position' })
     position: Position;
+
+    @OneToOne(() => SelectionProcess, (selectionProcess) => selectionProcess.candidate)
+    @JoinColumn({ name: 'id_selection_process' })
+    selectionProcess: SelectionProcess;
 }

@@ -8,11 +8,8 @@ export class Position {
     id_position: number;
 
     @Column({ length: 50 })
-    title: string;
-
-    @Column({ length: 200 })
-    description: string;
-
+    name: string;
+    
     @OneToMany(() => Candidate, (candidate) => candidate.position)
     candidates: Candidate[];
 }
