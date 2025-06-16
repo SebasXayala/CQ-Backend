@@ -55,10 +55,20 @@ export class RolesService {
     if (!Number.isInteger(id) || id <= 0) {
       throw new BadRequestException('El id debe ser un número entero positivo');
     }
-    const role = await this.roleRepository.findOneBy({ id_role: id });
-    if (!role) throw new NotFoundException('No se encontró Rol con id ' + id);
+    const role = await this.roleRepository.findOne({
+      where: { id_role: id },
+      relations: ['users'],
+    });
+    if (!role) {
+      throw new NotFoundException(`No se encontró Rol con id ${id}`);
+    }
+    if (Array.isArray(role.users) && role.users.length > 0) {
+      throw new ConflictException('No se puede eliminar el rol porque está en uso por uno o más usuarios');
+    }
     const result = await this.roleRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException('No se encontró Rol con id ' + id);
+    if (!result.affected) {
+      throw new NotFoundException(`No se encontró Rol con id ${id}`);
+    }
     return role;
   }
 }
