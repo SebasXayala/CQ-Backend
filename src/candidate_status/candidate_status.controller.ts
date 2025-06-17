@@ -4,7 +4,7 @@ import { CreateCandidateStatusDto } from './dto/create-candidate_status.dto';
 import { UpdateCandidateStatusDto } from './dto/update-candidate_status.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('candidate-status')
+@Controller('candidate_status')
 @UseGuards(JwtAuthGuard)
 export class CandidateStatusController {
   constructor(private readonly candidateStatusService: CandidateStatusService) {}

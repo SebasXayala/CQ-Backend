@@ -8,7 +8,7 @@ export class UpdateCandidateStatusDto extends PartialType(CreateCandidateStatusD
     @MaxLength(20)
     @MinLength(3)
     @IsOptional()
-    state:string;
+    status:string;
 
     @IsString()
     @MaxLength(50)

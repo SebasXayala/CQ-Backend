@@ -10,7 +10,7 @@ export class CandidateStatus {
 
     @IsString()
     @Column({ length: 20 })
-    state: string;
+    status: string;
 
     @IsString()
     @Column({ length: 50 })

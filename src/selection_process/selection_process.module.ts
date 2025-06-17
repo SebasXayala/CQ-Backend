@@ -9,4 +9,4 @@ import { SelectionProcess } from './entities/selection_process.entity';
   controllers: [SelectionProcessController],
   providers: [SelectionProcessService],
 })
-export class SelectionProcessModule {}
+export class SelectionProcessModule { }
