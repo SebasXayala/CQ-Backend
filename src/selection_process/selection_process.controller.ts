@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { SelectionProcessService } from './selection_process.service';
 import { CreateSelectionProcessDto } from './dto/create-selection_process.dto';
 import { UpdateSelectionProcessDto } from './dto/update-selection_process.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('selection-process')
+@Controller('selection_process')
+@UseGuards(JwtAuthGuard)
 export class SelectionProcessController {
   constructor(private readonly selectionProcessService: SelectionProcessService) {}
 

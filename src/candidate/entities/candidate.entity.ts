@@ -34,6 +34,6 @@ export class Candidate {
     position: Position;
 
     @OneToOne(() => SelectionProcess, (selectionProcess) => selectionProcess.candidate)
-    @JoinColumn({ name: 'id_selection_process' })
+    @JoinColumn({ name: 'id_process' })
     selectionProcess: SelectionProcess;
 }
