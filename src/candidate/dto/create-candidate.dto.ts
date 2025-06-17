@@ -1,7 +1,5 @@
-import { CandidateStatus } from "src/candidate_status/entities/candidate_status.entity";
-import { Profile } from "src/profile/entities/profile.entity";
 import { IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
-import { Position } from "src/position/entities/position.entity";
+
 
 
 export class CreateCandidateDto {
