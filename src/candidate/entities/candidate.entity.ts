@@ -15,7 +15,7 @@ export class Candidate {
     @Column({ length: 20 })
     name: string;
 
-    @Column({ length: 10 })
+    @Column({ length: 8 })
     identifier: string;
 
     @Column({ length: 20 })
@@ -34,6 +34,6 @@ export class Candidate {
     position: Position;
 
     @OneToOne(() => SelectionProcess, (selectionProcess) => selectionProcess.candidate)
-    @JoinColumn({ name: 'id_process' })
+    @JoinColumn({ name: 'id_selection_process' })
     selectionProcess: SelectionProcess;
 }

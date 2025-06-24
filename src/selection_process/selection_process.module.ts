@@ -8,5 +8,6 @@ import { SelectionProcess } from './entities/selection_process.entity';
   imports: [TypeOrmModule.forFeature([SelectionProcess])],
   controllers: [SelectionProcessController],
   providers: [SelectionProcessService],
+  exports: [TypeOrmModule, SelectionProcessService],
 })
 export class SelectionProcessModule { }

@@ -13,7 +13,7 @@ export class CandidateStatus {
     status: string;
 
     @IsString()
-    @Column({ length: 50 })
+    @Column({ length: 100 })
     description: string;
 
     @OneToMany(() => Candidate, (candidate) => candidate.candidate_status)

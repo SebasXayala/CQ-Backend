@@ -18,7 +18,7 @@ export class CreateCandidateDto {
 
     @IsString()
     @MaxLength(20)
-    @MinLength(8)
+    @MinLength(3)
     @IsNotEmpty()
     identifier_type: string;
 

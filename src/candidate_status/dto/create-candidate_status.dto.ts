@@ -8,7 +8,7 @@ export class CreateCandidateStatusDto {
     status: string;
 
     @IsString()
-    @MaxLength(50)
+    @MaxLength(100)
     @MinLength(3)
     description: string;
 }
