@@ -6,19 +6,19 @@ export class UpdateCandidateDto extends PartialType(CreateCandidateDto) {
 
     @IsString()
     @MaxLength(50)
-    @MinLength(8)
+    @MinLength(5)
     @IsNotEmpty()
     name: string;
 
     @IsString()
     @MaxLength(10)
-    @MinLength(8)
+    @MinLength(3)
     @IsNotEmpty()
     identifier: string;
 
     @IsString()
     @MaxLength(20)
-    @MinLength(8)
+    @MinLength(3)
     @IsNotEmpty()
     identifier_type: string;
 

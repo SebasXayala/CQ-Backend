@@ -6,13 +6,13 @@ export class CreateCandidateDto {
 
     @IsString()
     @MaxLength(50)
-    @MinLength(8)
+    @MinLength(5)
     @IsNotEmpty()
     name: string;
 
     @IsString()
     @MaxLength(10)
-    @MinLength(8)
+    @MinLength(3)
     @IsNotEmpty()
     identifier: string;
 
