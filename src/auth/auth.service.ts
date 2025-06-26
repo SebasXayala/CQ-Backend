@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(createUserDto: CreateUserDto) {
     if (await this.usersService.findByOneEmail(createUserDto.email)) {
@@ -30,7 +30,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByOneEmail(loginDto.email);
-    if (!user) {    
+    if (!user) {
       throw new BadGatewayException('Invalid email');
     }
     const isPasswordValid = await bcrypt.compare(
@@ -49,6 +49,6 @@ export class AuthService {
         email: user.email,
         role: user.id_role,
       },
-    };          
+    };
   }
 }
