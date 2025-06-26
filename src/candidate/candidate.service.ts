@@ -22,7 +22,7 @@ export class CandidateService {
     private readonly positionRepository: Repository<Position>,
     @InjectRepository(SelectionProcess)
     private readonly selectionProcessRepository: Repository<SelectionProcess>,
-  ) {}
+  ) { }
 
   async create(createCandidateDto: CreateCandidateDto) {
     const { name, identifier, identifier_type, profile, candidate_status, position } = createCandidateDto;
@@ -112,5 +112,16 @@ export class CandidateService {
     }
     await this.candidateRepository.remove(candidate);
     return { message: 'Candidato eliminado correctamente.' };
+  }
+
+  async findByIdentifier(identifier: string) {
+    const candidate = await this.candidateRepository.findOne({
+      where: { identifier },
+      relations: ['profile', 'candidate_status', 'position', 'selectionProcess']
+    });
+    if (!candidate) {
+      throw new NotFoundException(`No se encontró el candidato con identificador ${identifier}`);
+    }
+    return candidate;
   }
 }
