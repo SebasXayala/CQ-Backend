@@ -24,7 +24,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Post('candidate-login')
+  @Post('candidate_login')
   async candidateLogin(
     @Body()
     candidateLoginDto: CandidateLoginDto,
