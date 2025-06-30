@@ -21,6 +21,14 @@ import { CandidateStatus } from './candidate_status/entities/candidate_status.en
 import { Profile } from './profile/entities/profile.entity';
 import { Position } from './position/entities/position.entity';
 import { SelectionProcess } from './selection_process/entities/selection_process.entity';
+import { FolderModule } from './folder/folder.module';
+import { Folder } from './folder/entities/folder.entity';
+import { Document } from './document/entities/document.entuty';
+import { DocumentModule } from './document/document.module';
+import { DocumentStatusController } from './document_status/document_status.controller';
+import { DocumentStatusService } from './document_status/document_status.service';
+import { DocumentStatusModule } from './document_status/document_status.module';
+import { DocumentStatus } from './document_status/entities/document_status.entity';
 
 
 @Module({
@@ -33,7 +41,7 @@ import { SelectionProcess } from './selection_process/entities/selection_process
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
-        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess],
+        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, Folder, Document, DocumentStatus,],
         autoLoadEntities: true,
         synchronize: false,
         ssl: { rejectUnauthorized: false },
@@ -48,9 +56,12 @@ import { SelectionProcess } from './selection_process/entities/selection_process
     SelectionProcessModule,
     PositionModule,
     ProfileModule,
+    FolderModule,
+    DocumentModule,
+    DocumentStatusModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, DocumentStatusController],
+  providers: [AppService, DocumentStatusService],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}
