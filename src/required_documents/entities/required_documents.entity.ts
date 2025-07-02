@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Profile } from 'src/profile/entities/profile.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ListDocument } from 'src/list_document/entities/list_document.entity';
 
 @Entity('required_documents')
 export class RequiredDocuments {
@@ -7,13 +7,9 @@ export class RequiredDocuments {
     @PrimaryGeneratedColumn()
     id_required_documents: number;
 
-    @Column({ length: 80 })
+    @Column({ length: 200 })
     name_required_documents: string;
 
-    @Column()
-    id_profile: number;
-
-    @ManyToOne(() => Profile, (profile) => profile.requiredDocuments)
-    @JoinColumn({ name: 'id_profile' })
-    profile: Profile;
+    @OneToMany(() => ListDocument, (listDocument) => listDocument.requiredDocuments)
+    listDocuments: ListDocument[];
 }

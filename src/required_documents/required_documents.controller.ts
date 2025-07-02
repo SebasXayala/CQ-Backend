@@ -24,11 +24,6 @@ export class RequiredDocumentsController {
         return this.requiredDocumentsService.findOne(+id);
     }
 
-    @Get('profile/:profileId')
-    findByProfile(@Param('profileId') profileId: string) {
-        return this.requiredDocumentsService.findByProfile(+profileId);
-    }
-
     @Patch(':id')
     update(@Param('id') id: string, @Body() updateRequiredDocumentsDto: UpdateRequiredDocumentsDto) {
         return this.requiredDocumentsService.update(+id, updateRequiredDocumentsDto);
