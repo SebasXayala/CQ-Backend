@@ -21,6 +21,15 @@ export class Candidate {
     @Column({ length: 20 })
     identifier_type: string;
 
+    @Column({ length: 50 })
+    email: string;
+
+    @Column({ type: 'char', length: 10 })
+    phone: string;
+
+    @Column({ length: 100 })
+    password: string;
+
     @ManyToOne(() => Profile, (profile) => profile.candidates)
     @JoinColumn({ name: 'id_profile' })
     profile: Profile;

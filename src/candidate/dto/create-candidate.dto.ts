@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
 
 
 
@@ -21,6 +21,17 @@ export class CreateCandidateDto {
     @MinLength(3)
     @IsNotEmpty()
     identifier_type: string;
+
+    @IsEmail()
+    @MaxLength(50)
+    @IsNotEmpty()
+    email: string;
+
+    @IsString()
+    @MaxLength(10)
+    @MinLength(10)
+    @IsNotEmpty()
+    phone: string;
 
     @IsInt()
     @IsPositive()

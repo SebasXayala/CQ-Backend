@@ -2,6 +2,7 @@ import {
   BadGatewayException,
   BadRequestException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CandidateService } from '../candidate/candidate.service';
@@ -56,33 +57,34 @@ export class AuthService {
   }
 
   async candidateLogin(candidateLoginDto: CandidateLoginDto) {
-    const candidate = await this.candidateService.findByIdentifier(candidateLoginDto.identifier);
+    try {
+      const candidate = await this.candidateService.findByEmail(candidateLoginDto.email);
 
-    const payload = { identifier: candidate.identifier, type: 'candidate' };
+      // Verificar la contraseña
+      const isPasswordValid = await bcrypt.compare(
+        candidateLoginDto.password,
+        candidate.password
+      );
 
-    return {
-      access_token: this.jwtService.sign(payload),
-      candidate: {
-        ...candidate,
-        profile: candidate.profile && {
-          id_profile: candidate.profile.id_profile,
-          name: candidate.profile.name
-        },
-        candidate_status: candidate.candidate_status && {
-          id_candidate_status: candidate.candidate_status.id_candidate_status,
-          status: candidate.candidate_status.status,
-          description: candidate.candidate_status.description
-        },
-        position: candidate.position && {
-          id_position: candidate.position.id_position,
-          name: candidate.position.name
-        },
-        selectionProcess: candidate.selectionProcess && {
-          id_process: candidate.selectionProcess.id_process,
-          start_date: candidate.selectionProcess.start_date,
-          end_date: candidate.selectionProcess.end_date
-        }
-      },
-    };
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Credenciales incorrectas.');
+      }
+
+      const payload = {
+        email: candidate.email,
+        identifier: candidate.identifier,
+        type: 'candidate'
+      };
+
+      // Retornar información limpia sin la contraseña
+      const { password, ...candidateData } = candidate;
+
+      return {
+        access_token: this.jwtService.sign(payload),
+        candidate: candidateData
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Credenciales incorrectas. Verifique sus datos de acceso.');
+    }
   }
 }
