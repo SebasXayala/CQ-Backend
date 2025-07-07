@@ -34,14 +34,51 @@ import { ListDocument } from './list_document/entities/list_document.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get<string>('DATABASE_URL'),
-        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
-        autoLoadEntities: true,
-        synchronize: false,
-        ssl: { rejectUnauthorized: false },
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get<string>('DATABASE_URL');
+        console.log('DATABASE_URL configured:', databaseUrl ? 'Yes' : 'No');
+
+        // Configuración específica para Neon en Railway
+        if (databaseUrl?.includes('neon.tech')) {
+          const url = new URL(databaseUrl);
+          return {
+            type: 'postgres',
+            host: url.hostname,
+            port: parseInt(url.port) || 5432,
+            username: url.username,
+            password: url.password,
+            database: url.pathname.slice(1),
+            entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
+            autoLoadEntities: true,
+            synchronize: false,
+            ssl: {
+              rejectUnauthorized: false,
+            },
+            extra: {
+              ssl: {
+                rejectUnauthorized: false,
+              },
+            },
+          };
+        }
+
+        return {
+          type: 'postgres',
+          url: databaseUrl,
+          entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
+          autoLoadEntities: true,
+          synchronize: false,
+          ssl: {
+            rejectUnauthorized: false,
+            sslmode: 'require',
+          },
+          extra: {
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          },
+        };
+      },
     }),
 
     UsersModule,
