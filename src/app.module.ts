@@ -13,6 +13,8 @@ import { ProfileModule } from './profile/profile.module';
 import { PositionModule } from './position/position.module';
 import { SelectionProcessModule } from './selection_process/selection_process.module';
 import { CandidateStatusModule } from './candidate_status/candidate_status.module';
+import { RequiredDocumentsModule } from './required_documents/required_documents.module';
+import { ListDocumentModule } from './list_document/list_document.module';
 /* Import Entity */
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
@@ -21,6 +23,8 @@ import { CandidateStatus } from './candidate_status/entities/candidate_status.en
 import { Profile } from './profile/entities/profile.entity';
 import { Position } from './position/entities/position.entity';
 import { SelectionProcess } from './selection_process/entities/selection_process.entity';
+import { RequiredDocuments } from './required_documents/entities/required_documents.entity';
+import { ListDocument } from './list_document/entities/list_document.entity';
 
 
 @Module({
@@ -33,7 +37,7 @@ import { SelectionProcess } from './selection_process/entities/selection_process
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
-        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess],
+        entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
         autoLoadEntities: true,
         synchronize: false,
         ssl: { rejectUnauthorized: false },
@@ -48,12 +52,14 @@ import { SelectionProcess } from './selection_process/entities/selection_process
     SelectionProcessModule,
     PositionModule,
     ProfileModule,
+    RequiredDocumentsModule,
+    ListDocumentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) { }
   async onModuleInit() {
     try {
       console.log('✅ Conectado correctamente a la base de datos');

@@ -20,5 +20,6 @@ import { SelectionProcess } from 'src/selection_process/entities/selection_proce
   ],
   controllers: [CandidateController, CandidateStatusController],
   providers: [CandidateService, CandidateStatusService],
+  exports: [CandidateService],
 })
-export class CandidateModule {}
+export class CandidateModule { }
