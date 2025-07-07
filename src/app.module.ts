@@ -36,13 +36,18 @@ import { ListDocument } from './list_document/entities/list_document.entity';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const databaseUrl = config.get<string>('DATABASE_URL');
-        console.log('DATABASE_URL configured:', databaseUrl ? 'Yes' : 'No');
+
+        // Solo mostrar logs en desarrollo
+        const isDevelopment = process.env.NODE_ENV !== 'production';
+        if (isDevelopment) {
+          console.log('DATABASE_URL configured:', databaseUrl ? 'Yes' : 'No');
+        }
 
         // Configuración específica para Neon en Railway
         if (databaseUrl?.includes('neon.tech')) {
           const url = new URL(databaseUrl);
           return {
-            type: 'postgres',
+            type: 'postgres' as const,
             host: url.hostname,
             port: parseInt(url.port) || 5432,
             username: url.username,
@@ -63,7 +68,7 @@ import { ListDocument } from './list_document/entities/list_document.entity';
         }
 
         return {
-          type: 'postgres',
+          type: 'postgres' as const,
           url: databaseUrl,
           entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
           autoLoadEntities: true,
