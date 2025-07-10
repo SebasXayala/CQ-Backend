@@ -1,51 +1,56 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateCandidateDto } from './create-candidate.dto';
-import { IsEmail, IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateCandidateDto extends PartialType(CreateCandidateDto) {
 
     @IsString()
     @MaxLength(50)
     @MinLength(5)
-    @IsNotEmpty()
-    name: string;
+    @IsOptional()
+    name?: string;
 
     @IsString()
     @MaxLength(10)
     @MinLength(3)
-    @IsNotEmpty()
-    identifier: string;
+    @IsOptional()
+    identifier?: string;
 
     @IsString()
     @MaxLength(20)
     @MinLength(3)
-    @IsNotEmpty()
-    identifier_type: string;
+    @IsOptional()
+    identifier_type?: string;
 
     @IsEmail()
     @MaxLength(50)
-    @IsNotEmpty()
-    email: string;
+    @IsOptional()
+    email?: string;
 
     @IsString()
     @MaxLength(10)
     @MinLength(10)
-    @IsNotEmpty()
-    phone: string;
+    @IsOptional()
+    phone?: string;
+
+    @IsString()
+    @MaxLength(30)
+    @MinLength(1)
+    @IsOptional()
+    password?: string;
 
     @IsInt()
     @IsPositive()
-    @IsNotEmpty()
-    @IsNotEmpty()
-    profile: number;
+    @IsOptional()
+    profile?: number;
 
     @IsInt()
     @IsPositive()
-    @IsNotEmpty()
-    candidate_status: number;
+    @IsOptional()
+    candidate_status?: number;
 
     @IsInt()
     @IsPositive()
-    @IsNotEmpty()
-    position: number;
+    @IsOptional()
+    position?: number;
 }
