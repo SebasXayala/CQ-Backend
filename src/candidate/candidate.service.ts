@@ -29,7 +29,7 @@ export class CandidateService {
   private generateRandomPassword(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let password = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return password;
@@ -139,6 +139,12 @@ export class CandidateService {
       if (!positionEntity) throw new NotFoundException('Posición no encontrada.');
       candidate.position = positionEntity;
     }
+    
+    // Hash de la contraseña si se proporciona
+    if (updateCandidateDto.password) {
+      updateCandidateDto.password = await bcrypt.hash(updateCandidateDto.password, 10);
+    }
+    
     Object.assign(candidate, updateCandidateDto);
     return await this.candidateRepository.save(candidate);
   }

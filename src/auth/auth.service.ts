@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { CandidateLoginDto } from './dto/candidate-login.dto';
+import { LogoutResponseDto } from './dto/logout-response.dto';
+import { TokenBlacklistService } from './token-blacklist.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +20,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly candidateService: CandidateService,
     private readonly jwtService: JwtService,
+    private readonly tokenBlacklistService: TokenBlacklistService,
   ) { }
 
   async register(createUserDto: CreateUserDto) {
@@ -86,5 +89,47 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException('Credenciales incorrectas. Verifique sus datos de acceso.');
     }
+  }
+
+  /**
+   * Logout de usuario - invalida el token JWT
+   * @param token - Token JWT a invalidar
+   * @returns mensaje de confirmación
+   */
+  async logout(token: string): Promise<LogoutResponseDto> {
+    try {
+      // Remover el prefijo "Bearer " si existe
+      const cleanToken = token.startsWith('Bearer ') ? token.slice(7) : token;
+
+      // Verificar que el token sea válido antes de agregarlo a la blacklist
+      const decoded = this.jwtService.verify(cleanToken);
+
+      // Verificar que sea un token de usuario (no de candidato)
+      if (decoded.type === 'candidate') {
+        throw new BadRequestException('Token de candidato no válido para logout de usuario');
+      }
+
+      // Agregar el token a la blacklist
+      this.tokenBlacklistService.blacklistToken(cleanToken);
+
+      return new LogoutResponseDto('Logout exitoso');
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        return new LogoutResponseDto('Token ya expirado, logout exitoso');
+      }
+      if (error.name === 'JsonWebTokenError') {
+        throw new BadRequestException('Token inválido');
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Verifica si un token está en la blacklist
+   * @param token - Token a verificar
+   * @returns true si está en blacklist, false si no
+   */
+  isTokenBlacklisted(token: string): boolean {
+    return this.tokenBlacklistService.isTokenBlacklisted(token);
   }
 }

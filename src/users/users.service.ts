@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RolesService } from 'src/role/roles.service';
+import * as bcrypt from 'bcryptjs';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -53,8 +55,18 @@ export class UsersService {
         throw new ConflictException('Ya existe un Usuario con ese email');
       }
     }
-    const role = await this.rolesService.findOne(dto.id_role);
-    if (!role) throw new NotFoundException(`No se encontró Rol con id ${dto.id_role}`);
+
+    // Validar rol solo si se proporciona
+    if (dto.id_role) {
+      const role = await this.rolesService.findOne(dto.id_role);
+      if (!role) throw new NotFoundException(`No se encontró Rol con id ${dto.id_role}`);
+    }
+
+    // Hash de la contraseña si se proporciona
+    if (dto.password) {
+      dto.password = await bcrypt.hash(dto.password, 10);
+    }
+
     await this.userRepository.update({ id_user: id }, dto);
     return this.findOne(id);
   }
