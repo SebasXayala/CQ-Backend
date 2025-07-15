@@ -8,11 +8,13 @@ import { UsersService } from '../users/users.service';
 import { CandidateService } from '../candidate/candidate.service';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { CandidateLoginDto } from './dto/candidate-login.dto';
 import { LogoutResponseDto } from './dto/logout-response.dto';
-import { TokenBlacklistService } from './token-blacklist.service';
+import { JwtBlacklistService } from './jwt-blacklist.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +22,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly candidateService: CandidateService,
     private readonly jwtService: JwtService,
-    private readonly tokenBlacklistService: TokenBlacklistService,
+    private readonly configService: ConfigService,
+    private readonly jwtBlacklistService: JwtBlacklistService,
   ) { }
 
   async register(createUserDto: CreateUserDto) {
@@ -48,9 +51,23 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadGatewayException('Invalid password');
     }
-    const payload = { email: user.email };
+
+    const jti = uuidv4();
+    const payload = {
+      sub: user.id_user,
+      email: user.email,
+      role: user.role.name,
+      jti: jti,
+      userType: 'user'
+    };
+
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('JWT_SECRET_USER'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN_USER') || '7d',
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: token,
       user: {
         id: user.id_user,
         email: user.email,
@@ -73,17 +90,26 @@ export class AuthService {
         throw new UnauthorizedException('Credenciales incorrectas.');
       }
 
+      const jti = uuidv4();
       const payload = {
+        sub: candidate.id_candidate,
         email: candidate.email,
         identifier: candidate.identifier,
-        type: 'candidate'
+        name: candidate.name,
+        jti: jti,
+        userType: 'candidate'
       };
+
+      const token = this.jwtService.sign(payload, {
+        secret: this.configService.get<string>('JWT_SECRET_CANDIDATE'),
+        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN_CANDIDATE') || '24h',
+      });
 
       // Retornar información limpia sin la contraseña
       const { password, ...candidateData } = candidate;
 
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token: token,
         candidate: candidateData
       };
     } catch (error) {
@@ -93,6 +119,38 @@ export class AuthService {
 
   /**
    * Logout de usuario - invalida el token JWT
+   * @param jti - JWT ID del token a invalidar
+   * @returns mensaje de confirmación
+   */
+  async userLogout(jti: string): Promise<LogoutResponseDto> {
+    try {
+      // Agregar el JTI a la blacklist
+      this.jwtBlacklistService.blacklistToken(jti, 'user');
+
+      return new LogoutResponseDto('Logout de usuario exitoso');
+    } catch (error) {
+      throw new BadRequestException('Error al cerrar sesión');
+    }
+  }
+
+  /**
+   * Logout de candidato - invalida el token JWT
+   * @param jti - JWT ID del token a invalidar
+   * @returns mensaje de confirmación
+   */
+  async candidateLogout(jti: string): Promise<LogoutResponseDto> {
+    try {
+      // Agregar el JTI a la blacklist
+      this.jwtBlacklistService.blacklistToken(jti, 'candidate');
+
+      return new LogoutResponseDto('Logout de candidato exitoso');
+    } catch (error) {
+      throw new BadRequestException('Error al cerrar sesión');
+    }
+  }
+
+  /**
+   * Logout de usuario - invalida el token JWT (método legacy)
    * @param token - Token JWT a invalidar
    * @returns mensaje de confirmación
    */
@@ -110,7 +168,7 @@ export class AuthService {
       }
 
       // Agregar el token a la blacklist
-      this.tokenBlacklistService.blacklistToken(cleanToken);
+      this.jwtBlacklistService.blacklistToken(cleanToken, 'user');
 
       return new LogoutResponseDto('Logout exitoso');
     } catch (error) {
@@ -126,10 +184,11 @@ export class AuthService {
 
   /**
    * Verifica si un token está en la blacklist
-   * @param token - Token a verificar
+   * @param jti - JTI del token a verificar
+   * @param userType - Tipo de usuario ('user' o 'candidate')
    * @returns true si está en blacklist, false si no
    */
-  isTokenBlacklisted(token: string): boolean {
-    return this.tokenBlacklistService.isTokenBlacklisted(token);
+  isTokenBlacklisted(jti: string, userType: 'user' | 'candidate'): boolean {
+    return this.jwtBlacklistService.isTokenBlacklisted(jti, userType);
   }
 }

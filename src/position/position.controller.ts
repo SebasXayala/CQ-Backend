@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { PositionService } from './position.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
 @Controller('position')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class PositionController {
-  constructor(private readonly positionService: PositionService) {}
+  constructor(private readonly positionService: PositionService) { }
 
   @Post()
   create(@Body() createPositionDto: CreatePositionDto) {

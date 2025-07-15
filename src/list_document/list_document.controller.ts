@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntP
 import { ListDocumentService } from './list_document.service';
 import { CreateListDocumentDto } from './dto/create-list_document.dto';
 import { UpdateListDocumentDto } from './dto/update-list_document.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CandidateJwtAuthGuard } from 'src/auth/guards/candidate-jwt-auth.guard';
 
-@Controller('list_document')
-@UseGuards(JwtAuthGuard)
+@Controller('list-document')
+@UseGuards(CandidateJwtAuthGuard)
 export class ListDocumentController {
     constructor(private readonly listDocumentService: ListDocumentService) { }
 

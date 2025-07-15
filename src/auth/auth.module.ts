@@ -5,9 +5,10 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TokenBlacklistService } from './token-blacklist.service';
+import { JwtBlacklistService } from './jwt-blacklist.service';
+import { UserJwtStrategy } from './strategies/user-jwt.strategy';
+import { CandidateJwtStrategy } from './strategies/candidate-jwt.strategy';
 
 @Module({
   imports: [
@@ -20,12 +21,19 @@ import { TokenBlacklistService } from './token-blacklist.service';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         global: true,
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '2h' },
+        // Configuración base, los secretos específicos se manejan en las estrategias
+        secret: configService.get<string>('JWT_SECRET_USER'),
+        signOptions: { expiresIn: '7d' },
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, TokenBlacklistService],
+  providers: [
+    AuthService,
+    JwtBlacklistService,
+    UserJwtStrategy,
+    CandidateJwtStrategy,
+  ],
   controllers: [AuthController],
+  exports: [AuthService, JwtBlacklistService],
 })
 export class AuthModule { }

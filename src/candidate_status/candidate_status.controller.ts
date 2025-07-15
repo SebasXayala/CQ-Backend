@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { CandidateStatusService } from './candidate_status.service';
 import { CreateCandidateStatusDto } from './dto/create-candidate_status.dto';
 import { UpdateCandidateStatusDto } from './dto/update-candidate_status.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
-@Controller('candidate_status')
-@UseGuards(JwtAuthGuard)
+@Controller('candidate-status')
+@UseGuards(UserJwtAuthGuard)
 export class CandidateStatusController {
-  constructor(private readonly candidateStatusService: CandidateStatusService) {}
+  constructor(private readonly candidateStatusService: CandidateStatusService) { }
 
   @Post()
   create(@Body() createCandidateStatusDto: CreateCandidateStatusDto) {

@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
 @Controller('profile')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 

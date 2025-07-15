@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { RequiredDocumentsService } from './required_documents.service';
 import { CreateRequiredDocumentsDto } from './dto/create-required_documents.dto';
 import { UpdateRequiredDocumentsDto } from './dto/update-required_documents.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
-@Controller('required_documents')
-@UseGuards(JwtAuthGuard)
+@Controller('required-documents')
+@UseGuards(UserJwtAuthGuard)
 export class RequiredDocumentsController {
     constructor(private readonly requiredDocumentsService: RequiredDocumentsService) { }
 

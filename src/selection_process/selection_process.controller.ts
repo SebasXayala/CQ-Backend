@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { SelectionProcessService } from './selection_process.service';
 import { CreateSelectionProcessDto } from './dto/create-selection_process.dto';
 import { UpdateSelectionProcessDto } from './dto/update-selection_process.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
 @Controller('selection_process')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class SelectionProcessController {
-  constructor(private readonly selectionProcessService: SelectionProcessService) {}
+  constructor(private readonly selectionProcessService: SelectionProcessService) { }
 
   @Post()
   create(@Body() createSelectionProcessDto: CreateSelectionProcessDto) {

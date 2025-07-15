@@ -1,9 +1,10 @@
-import { Controller, Post, Body, Headers, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Headers, UseGuards, Request, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { CandidateLoginDto } from './dto/candidate-login.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { UserJwtAuthGuard } from './guards/user-jwt-auth.guard';
+import { CandidateJwtAuthGuard } from './guards/candidate-jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,15 +18,29 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  @Post('login')
-  async login(
+  // ===== ENDPOINTS PARA USUARIOS =====
+  @Post('user/login')
+  async userLogin(
     @Body()
     loginDto: LoginDto,
   ) {
     return this.authService.login(loginDto);
   }
 
-  @Post('candidate_login')
+  @Post('user/logout')
+  @UseGuards(UserJwtAuthGuard)
+  async userLogout(
+    @Request() req: any,
+  ) {
+    const jti = req.user?.jti;
+    if (!jti) {
+      throw new BadRequestException('Token inválido: JTI no encontrado');
+    }
+    return this.authService.userLogout(jti);
+  }
+
+  // ===== ENDPOINTS PARA CANDIDATOS =====
+  @Post('candidate/login')
   async candidateLogin(
     @Body()
     candidateLoginDto: CandidateLoginDto,
@@ -33,14 +48,15 @@ export class AuthController {
     return this.authService.candidateLogin(candidateLoginDto);
   }
 
-  @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  async logout(
-    @Headers('authorization') authorization: string,
+  @Post('candidate/logout')
+  @UseGuards(CandidateJwtAuthGuard)
+  async candidateLogout(
+    @Request() req: any,
   ) {
-    if (!authorization) {
-      throw new Error('Token de autorización requerido');
+    const jti = req.user?.jti;
+    if (!jti) {
+      throw new BadRequestException('Token inválido: JTI no encontrado');
     }
-    return this.authService.logout(authorization);
+    return this.authService.candidateLogout(jti);
   }
 }

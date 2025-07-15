@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards } from '@n
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from '../auth/guards/user-jwt-auth.guard';
 
 @Controller('roles')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class RoleController {
   constructor(private readonly RolesService: RolesService) { }
 

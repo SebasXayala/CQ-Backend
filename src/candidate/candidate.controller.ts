@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { CandidateService } from './candidate.service';
 import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
 @Controller('candidate')
-@UseGuards(JwtAuthGuard)
+@UseGuards(UserJwtAuthGuard)
 export class CandidateController {
   constructor(private readonly candidateService: CandidateService) { }
 
