@@ -1,8 +1,9 @@
 import { Position } from 'src/position/entities/position.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
 import { CandidateStatus } from 'src/candidate_status/entities/candidate_status.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne, OneToMany } from 'typeorm';
 import { SelectionProcess } from 'src/selection_process/entities/selection_process.entity';
+import { Folder } from 'src/folder/entities/folder.entity';
 import { Exclude } from 'class-transformer';
 
 
@@ -47,4 +48,7 @@ export class Candidate {
     @OneToOne(() => SelectionProcess, (selectionProcess) => selectionProcess.candidate)
     @JoinColumn({ name: 'id_selection_process' })
     selectionProcess: SelectionProcess;
+
+    @OneToMany(() => Folder, (folder) => folder.candidate)
+    folders: Folder[];
 }

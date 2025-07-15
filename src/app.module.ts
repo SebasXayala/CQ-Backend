@@ -25,6 +25,8 @@ import { Position } from './position/entities/position.entity';
 import { SelectionProcess } from './selection_process/entities/selection_process.entity';
 import { RequiredDocuments } from './required_documents/entities/required_documents.entity';
 import { ListDocument } from './list_document/entities/list_document.entity';
+import { Folder } from './folder/entities/folder.entity';
+import { FolderModule } from './folder/folder.module';
 
 
 @Module({
@@ -53,7 +55,7 @@ import { ListDocument } from './list_document/entities/list_document.entity';
             username: url.username,
             password: url.password,
             database: url.pathname.slice(1),
-            entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
+            entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder],
             autoLoadEntities: true,
             synchronize: false,
             ssl: {
@@ -70,7 +72,7 @@ import { ListDocument } from './list_document/entities/list_document.entity';
         return {
           type: 'postgres' as const,
           url: databaseUrl,
-          entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument],
+          entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder],
           autoLoadEntities: true,
           synchronize: false,
           ssl: {
@@ -96,6 +98,7 @@ import { ListDocument } from './list_document/entities/list_document.entity';
     ProfileModule,
     RequiredDocumentsModule,
     ListDocumentModule,
+    FolderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

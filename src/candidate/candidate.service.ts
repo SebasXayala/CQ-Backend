@@ -36,8 +36,8 @@ export class CandidateService {
   }
 
   async create(createCandidateDto: CreateCandidateDto) {
-    const { name, identifier, identifier_type, email, phone, profile, candidate_status, position } = createCandidateDto;
-    if (!name || !identifier || !identifier_type || !email || !phone || !profile || !candidate_status || !position) {
+    const { name, identifier, identifier_type, email, phone, profile, position } = createCandidateDto;
+    if (!name || !identifier || !identifier_type || !email || !phone || !profile || !position) {
       throw new BadRequestException('Todos los campos son obligatorios.');
     }
     // Validar unicidad de identifier
@@ -59,8 +59,11 @@ export class CandidateService {
     // Validar existencia de relaciones
     const profileEntity = await this.profileRepository.findOne({ where: { id_profile: profile } });
     if (!profileEntity) throw new NotFoundException('Perfil no encontrado.');
-    const statusEntity = await this.candidateStatusRepository.findOne({ where: { id_candidate_status: candidate_status } });
-    if (!statusEntity) throw new NotFoundException('Estado de candidato no encontrado.');
+
+    // Asignar automáticamente candidate_status = 1
+    const statusEntity = await this.candidateStatusRepository.findOne({ where: { id_candidate_status: 1 } });
+    if (!statusEntity) throw new NotFoundException('Estado de candidato por defecto (ID: 1) no encontrado.');
+
     const positionEntity = await this.positionRepository.findOne({ where: { id_position: position } });
     if (!positionEntity) throw new NotFoundException('Posición no encontrada.');
 
@@ -86,6 +89,7 @@ export class CandidateService {
 
     // Retornar información limpia sin exponer la contraseña encriptada
     return {
+      id_candidate: savedCandidate.id_candidate, // Agregar el ID
       name: savedCandidate.name,
       identifier: savedCandidate.identifier,
       email: savedCandidate.email,
@@ -139,12 +143,12 @@ export class CandidateService {
       if (!positionEntity) throw new NotFoundException('Posición no encontrada.');
       candidate.position = positionEntity;
     }
-    
+
     // Hash de la contraseña si se proporciona
     if (updateCandidateDto.password) {
       updateCandidateDto.password = await bcrypt.hash(updateCandidateDto.password, 10);
     }
-    
+
     Object.assign(candidate, updateCandidateDto);
     return await this.candidateRepository.save(candidate);
   }

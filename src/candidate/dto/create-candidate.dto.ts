@@ -1,4 +1,4 @@
-import { IsEmail, IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsInt, IsNotEmpty, IsPositive, IsString, MaxLength, MinLength, IsOptional } from 'class-validator';
 
 
 
@@ -38,10 +38,10 @@ export class CreateCandidateDto {
     @IsNotEmpty()
     profile: number;
 
+    @IsOptional()
     @IsInt()
     @IsPositive()
-    @IsNotEmpty()
-    candidate_status: number;
+    candidate_status?: number;
 
     @IsInt()
     @IsPositive()
