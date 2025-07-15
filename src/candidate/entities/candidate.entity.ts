@@ -3,6 +3,7 @@ import { Profile } from 'src/profile/entities/profile.entity';
 import { CandidateStatus } from 'src/candidate_status/entities/candidate_status.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import { SelectionProcess } from 'src/selection_process/entities/selection_process.entity';
+import { Exclude } from 'class-transformer';
 
 
 
@@ -27,6 +28,7 @@ export class Candidate {
     @Column({ type: 'char', length: 10 })
     phone: string;
 
+    @Exclude()
     @Column({ length: 100 })
     password: string;
 
