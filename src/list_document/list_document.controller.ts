@@ -4,7 +4,7 @@ import { CreateListDocumentDto } from './dto/create-list_document.dto';
 import { UpdateListDocumentDto } from './dto/update-list_document.dto';
 import { CandidateJwtAuthGuard } from 'src/auth/guards/candidate-jwt-auth.guard';
 
-@Controller('list-document')
+@Controller('list_document')
 @UseGuards(CandidateJwtAuthGuard)
 export class ListDocumentController {
     constructor(private readonly listDocumentService: ListDocumentService) { }
