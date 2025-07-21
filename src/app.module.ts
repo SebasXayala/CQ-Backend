@@ -15,6 +15,9 @@ import { SelectionProcessModule } from './selection_process/selection_process.mo
 import { CandidateStatusModule } from './candidate_status/candidate_status.module';
 import { RequiredDocumentsModule } from './required_documents/required_documents.module';
 import { ListDocumentModule } from './list_document/list_document.module';
+import { FolderModule } from './folder/folder.module';
+import { DocumentModule } from './document/document.module';
+import { DocumentStatusModule } from './document_status/document_status.module';
 /* Import Entity */
 import { User } from './users/entities/user.entity';
 import { Role } from './role/entities/role.entity';
@@ -26,7 +29,8 @@ import { SelectionProcess } from './selection_process/entities/selection_process
 import { RequiredDocuments } from './required_documents/entities/required_documents.entity';
 import { ListDocument } from './list_document/entities/list_document.entity';
 import { Folder } from './folder/entities/folder.entity';
-import { FolderModule } from './folder/folder.module';
+import { Document } from './document/entities/document.entity';
+import { DocumentStatus } from './document_status/entities/document_status.entity';
 
 
 @Module({
@@ -55,7 +59,7 @@ import { FolderModule } from './folder/folder.module';
             username: url.username,
             password: url.password,
             database: url.pathname.slice(1),
-            entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder],
+            entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder, Document, DocumentStatus],
             autoLoadEntities: true,
             synchronize: false,
             ssl: {
@@ -72,7 +76,7 @@ import { FolderModule } from './folder/folder.module';
         return {
           type: 'postgres' as const,
           url: databaseUrl,
-          entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder],
+          entities: [User, Role, Candidate, CandidateStatus, Profile, Position, SelectionProcess, RequiredDocuments, ListDocument, Folder, Document, DocumentStatus],
           autoLoadEntities: true,
           synchronize: false,
           ssl: {
@@ -99,6 +103,8 @@ import { FolderModule } from './folder/folder.module';
     RequiredDocumentsModule,
     ListDocumentModule,
     FolderModule,
+    DocumentModule,
+    DocumentStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

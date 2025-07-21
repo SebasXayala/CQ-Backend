@@ -50,5 +50,5 @@ export class Candidate {
     selectionProcess: SelectionProcess;
 
     @OneToMany(() => Folder, (folder) => folder.candidate)
-    folders: Folder[];
+    folder: Folder[];
 }

@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Candidate } from 'src/candidate/entities/candidate.entity';
+import { Document } from 'src/document/entities/document.entity';
 
 @Entity('folder')
 export class Folder {
@@ -16,7 +17,14 @@ export class Folder {
     @Column({ type: 'date' })
     modification_date: Date;
 
-    @ManyToOne(() => Candidate, (candidate) => candidate.folders)
+    @Column({ type: 'integer' })
+    id_document: number;
+
+    @ManyToOne(() => Candidate, (candidate) => candidate.folder)
     @JoinColumn({ name: 'id_candidate' })
     candidate: Candidate;
+
+    @OneToMany(() => Document, (document) => document.folder)
+    documents: Document[];
+
 }
