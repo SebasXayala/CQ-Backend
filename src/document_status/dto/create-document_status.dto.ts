@@ -1,1 +1,1 @@
-export class CreateDocumentStatusDto {}
+export class CreateDocumentStatusDto { }

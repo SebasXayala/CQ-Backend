@@ -4,7 +4,7 @@ import { CreateRequiredDocumentsDto } from './dto/create-required_documents.dto'
 import { UpdateRequiredDocumentsDto } from './dto/update-required_documents.dto';
 import { UserJwtAuthGuard } from 'src/auth/guards/user-jwt-auth.guard';
 
-@Controller('required-documents')
+@Controller('required_documents')
 @UseGuards(UserJwtAuthGuard)
 export class RequiredDocumentsController {
     constructor(private readonly requiredDocumentsService: RequiredDocumentsService) { }
