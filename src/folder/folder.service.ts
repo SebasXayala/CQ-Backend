@@ -205,7 +205,7 @@ export class FolderService {
     }
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number): Promise<Folder> {
     if (!id || id <= 0) {
       throw new BadRequestException('ID de carpeta inválido');
     }
@@ -220,6 +220,7 @@ export class FolderService {
 
     try {
       await this.folderRepository.delete(id);
+      return folder;
     } catch (error) {
       if (error.code === '23503') {
         throw new ConflictException(`No se puede eliminar la carpeta con id ${id} porque tiene registros relacionados`);
