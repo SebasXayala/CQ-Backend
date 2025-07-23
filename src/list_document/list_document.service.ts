@@ -124,7 +124,8 @@ export class ListDocumentService {
             id_profile: doc.id_profile,
             profile_name: doc.profile.name,
             id_required_documents: doc.id_required_documents,
-            name_required_documents: doc.requiredDocuments.name_required_documents
+            name_required_documents: doc.requiredDocuments.name_required_documents,
+            amount: doc.requiredDocuments.amount,
         }));
     }
 
