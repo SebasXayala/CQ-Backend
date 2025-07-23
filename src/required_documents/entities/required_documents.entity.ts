@@ -10,6 +10,9 @@ export class RequiredDocuments {
     @Column({ length: 200 })
     name_required_documents: string;
 
+    @Column({ type: 'int' })
+    amount: number;
+
     @OneToMany(() => ListDocument, (listDocument) => listDocument.requiredDocuments)
     listDocuments: ListDocument[];
 }

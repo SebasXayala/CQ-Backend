@@ -3,9 +3,9 @@ import { DocumentStatusService } from './document_status.service';
 import { CreateDocumentStatusDto } from './dto/create-document_status.dto';
 import { UpdateDocumentStatusDto } from './dto/update-document_status.dto';
 
-@Controller('document-status')
+@Controller('document_status')
 export class DocumentStatusController {
-  constructor(private readonly documentStatusService: DocumentStatusService) {}
+  constructor(private readonly documentStatusService: DocumentStatusService) { }
 
   @Post()
   create(@Body() createDocumentStatusDto: CreateDocumentStatusDto) {
