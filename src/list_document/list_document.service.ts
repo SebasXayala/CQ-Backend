@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { CreateListDocumentDto } from './dto/create-list_document.dto';
-import { UpdateListDocumentDto } from './dto/update-list_document.dto';
+import { ReplaceProfileDocumentsDto } from './dto/replace-profile-documents.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { ListDocument } from './entities/list_document.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
 import { RequiredDocuments } from 'src/required_documents/entities/required_documents.entity';
@@ -18,42 +17,57 @@ export class ListDocumentService {
         private readonly requiredDocumentsRepository: Repository<RequiredDocuments>,
     ) { }
 
-    async create(createListDocumentDto: CreateListDocumentDto) {
+    async replaceProfileDocuments(profileId: number, replaceDto: ReplaceProfileDocumentsDto) {
+        const { document_ids } = replaceDto;
+
         // Validar que el perfil exista
-        const profile = await this.profileRepository.findOneBy({ id_profile: createListDocumentDto.id_profile });
+        const profile = await this.profileRepository.findOneBy({ id_profile: profileId });
         if (!profile) {
-            throw new NotFoundException(`No se encontró Perfil con id ${createListDocumentDto.id_profile}`);
+            throw new NotFoundException(`No se encontró Perfil con id ${profileId}`);
         }
 
-        // Validar que el documento requerido exista
-        const requiredDocument = await this.requiredDocumentsRepository.findOneBy({
-            id_required_documents: createListDocumentDto.id_required_documents
-        });
-        if (!requiredDocument) {
-            throw new NotFoundException(`No se encontró Documento Requerido con id ${createListDocumentDto.id_required_documents}`);
-        }
+        // Si hay documentos para asignar, validar que existan
+        let requiredDocuments: RequiredDocuments[] = [];
+        if (document_ids.length > 0) {
+            requiredDocuments = await this.requiredDocumentsRepository.findBy({
+                id_required_documents: In(document_ids)
+            });
 
-        // Validar que no exista ya la relación (llave primaria compuesta)
-        const existingRelation = await this.listDocumentRepository.findOne({
-            where: {
-                id_profile: createListDocumentDto.id_profile,
-                id_required_documents: createListDocumentDto.id_required_documents
+            if (requiredDocuments.length !== document_ids.length) {
+                const foundIds = requiredDocuments.map(doc => doc.id_required_documents);
+                const notFoundIds = document_ids.filter(id => !foundIds.includes(id));
+                throw new NotFoundException(`No se encontraron los siguientes documentos: ${notFoundIds.join(', ')}`);
             }
-        });
-        if (existingRelation) {
-            throw new BadRequestException(`Ya existe una relación entre el Perfil ${createListDocumentDto.id_profile} y el Documento ${createListDocumentDto.id_required_documents}`);
         }
 
-        const listDocument = this.listDocumentRepository.create(createListDocumentDto);
-        const savedDocument = await this.listDocumentRepository.save(listDocument);
+        // Eliminar todas las relaciones existentes del perfil
+        await this.listDocumentRepository.delete({ id_profile: profileId });
 
-        // Retornar estructura plana
-        return {
-            id_profile: savedDocument.id_profile,
-            profile_name: profile.name,
-            id_required_documents: savedDocument.id_required_documents,
-            name_required_documents: requiredDocument.name_required_documents
-        };
+        // Si no hay documentos para asignar, retornar array vacío
+        if (document_ids.length === 0) {
+            return [];
+        }
+
+        // Crear las nuevas relaciones
+        const listDocuments = document_ids.map(docId =>
+            this.listDocumentRepository.create({
+                id_profile: profileId,
+                id_required_documents: docId
+            })
+        );
+
+        const savedDocuments = await this.listDocumentRepository.save(listDocuments);
+
+        // Retornar estructura plana para cada documento creado
+        return savedDocuments.map(savedDoc => {
+            const requiredDoc = requiredDocuments.find(doc => doc.id_required_documents === savedDoc.id_required_documents);
+            return {
+                id_profile: savedDoc.id_profile,
+                profile_name: profile.name,
+                id_required_documents: savedDoc.id_required_documents,
+                name_required_documents: requiredDoc?.name_required_documents || 'Documento no encontrado'
+            };
+        });
     }
 
     async findAll() {
@@ -127,79 +141,6 @@ export class ListDocumentService {
             name_required_documents: doc.requiredDocuments.name_required_documents,
             amount: doc.requiredDocuments.amount,
         }));
-    }
-
-    async update(profileId: number, requiredDocumentId: number, updateListDocumentDto: UpdateListDocumentDto) {
-        if (!Number.isInteger(profileId) || profileId <= 0) {
-            throw new BadRequestException('El id del perfil debe ser un número entero positivo');
-        }
-        if (!Number.isInteger(requiredDocumentId) || requiredDocumentId <= 0) {
-            throw new BadRequestException('El id del documento requerido debe ser un número entero positivo');
-        }
-
-        const listDocument = await this.listDocumentRepository.findOne({
-            where: {
-                id_profile: profileId,
-                id_required_documents: requiredDocumentId
-            }
-        });
-        if (!listDocument) {
-            throw new NotFoundException(`No se encontró Relación entre perfil ${profileId} y documento ${requiredDocumentId}`);
-        }
-
-        // Validar que el perfil exista si se actualiza
-        if (updateListDocumentDto.id_profile) {
-            const profile = await this.profileRepository.findOneBy({ id_profile: updateListDocumentDto.id_profile });
-            if (!profile) {
-                throw new NotFoundException(`No se encontró Perfil con id ${updateListDocumentDto.id_profile}`);
-            }
-        }
-
-        // Validar que el documento requerido exista si se actualiza
-        if (updateListDocumentDto.id_required_documents) {
-            const requiredDocument = await this.requiredDocumentsRepository.findOneBy({
-                id_required_documents: updateListDocumentDto.id_required_documents
-            });
-            if (!requiredDocument) {
-                throw new NotFoundException(`No se encontró Documento Requerido con id ${updateListDocumentDto.id_required_documents}`);
-            }
-        }
-
-        // Validar que no exista ya la relación con los nuevos valores (solo si se están actualizando)
-        const newProfileId = updateListDocumentDto.id_profile || profileId;
-        const newRequiredDocumentId = updateListDocumentDto.id_required_documents || requiredDocumentId;
-
-        // Solo validar si los valores nuevos son diferentes a los actuales
-        if (newProfileId !== profileId || newRequiredDocumentId !== requiredDocumentId) {
-            const existingRelation = await this.listDocumentRepository.findOne({
-                where: {
-                    id_profile: newProfileId,
-                    id_required_documents: newRequiredDocumentId
-                }
-            });
-            if (existingRelation) {
-                // Obtener los nombres para el mensaje de error
-                const profileForError = await this.profileRepository.findOneBy({ id_profile: newProfileId });
-                const requiredDocumentForError = await this.requiredDocumentsRepository.findOneBy({
-                    id_required_documents: newRequiredDocumentId
-                });
-
-                const profileName = profileForError?.name || `ID ${newProfileId}`;
-                const documentName = requiredDocumentForError?.name_required_documents || `ID ${newRequiredDocumentId}`;
-
-                throw new BadRequestException(`Ya está asignado el documento "${documentName}" al perfil "${profileName}"`);
-            }
-        }
-
-        await this.listDocumentRepository.update({
-            id_profile: profileId,
-            id_required_documents: requiredDocumentId
-        }, updateListDocumentDto);
-
-        return this.findOne(
-            updateListDocumentDto.id_profile || profileId,
-            updateListDocumentDto.id_required_documents || requiredDocumentId
-        );
     }
 
     async remove(profileId: number, requiredDocumentId: number) {
