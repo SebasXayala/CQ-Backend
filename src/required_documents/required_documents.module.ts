@@ -3,9 +3,10 @@ import { RequiredDocumentsService } from './required_documents.service';
 import { RequiredDocumentsController } from './required_documents.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RequiredDocuments } from './entities/required_documents.entity';
+import { ListDocument } from 'src/list_document/entities/list_document.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([RequiredDocuments])],
+    imports: [TypeOrmModule.forFeature([RequiredDocuments, ListDocument])],
     controllers: [RequiredDocumentsController],
     providers: [RequiredDocumentsService],
     exports: [TypeOrmModule, RequiredDocumentsService],

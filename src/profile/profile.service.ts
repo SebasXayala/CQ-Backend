@@ -4,12 +4,15 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from './entities/profile.entity';
+import { ListDocument } from 'src/list_document/entities/list_document.entity';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(ListDocument)
+    private readonly listDocumentRepository: Repository<ListDocument>,
   ) { }
 
   async create(createProfileDto: CreateProfileDto) {
@@ -66,11 +69,26 @@ export class ProfileService {
     if (!profile) {
       throw new NotFoundException(`No se encontró Perfil con id ${id}`);
     }
+
+    // Verificar si tiene candidatos asociados
     if (profile.candidates && profile.candidates.length > 0) {
       throw new ConflictException('No se puede eliminar el Perfil porque tiene candidatos asociados');
     }
+
+    // Verificar si está siendo utilizado en list_document
+    const listDocumentCount = await this.listDocumentRepository.count({
+      where: { id_profile: id }
+    });
+    if (listDocumentCount > 0) {
+      throw new ConflictException(
+        `No se puede eliminar el Perfil con id ${id} porque tiene documentos asociados en la lista de documentos. Elimine primero las referencias en la tabla de lista de documentos.`
+      );
+    }
+
     const result = await this.profileRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+    if (result.affected === 0) {
+      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+    }
     return profile;
   }
 }
