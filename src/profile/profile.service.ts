@@ -34,7 +34,7 @@ export class ProfileService {
     }
     const profile = await this.profileRepository.findOneBy({ id_profile: id });
     if (!profile) {
-      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+      throw new NotFoundException(`No se encontró Perfil`);
     }
     return profile;
   }
@@ -45,7 +45,7 @@ export class ProfileService {
     }
     const profile = await this.profileRepository.findOneBy({ id_profile: id });
     if (!profile) {
-      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+      throw new NotFoundException(`No se encontró Perfil`);
     }
     // Validar unicidad si se actualiza el nombre
     if (updateProfileDto.name && updateProfileDto.name !== profile.name) {
@@ -67,7 +67,7 @@ export class ProfileService {
       relations: ['candidates'],
     });
     if (!profile) {
-      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+      throw new NotFoundException(`No se encontró Perfil`);
     }
 
     // Verificar si tiene candidatos asociados
@@ -81,13 +81,13 @@ export class ProfileService {
     });
     if (listDocumentCount > 0) {
       throw new ConflictException(
-        `No se puede eliminar el Perfil con id ${id} porque tiene documentos asociados en la lista de documentos. Elimine primero las referencias en la tabla de lista de documentos.`
+        `No se puede eliminar el Perfil porque tiene documentos asociados en la lista de documentos. Elimine primero las referencias en la tabla de lista de documentos.`
       );
     }
 
     const result = await this.profileRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`No se encontró Perfil con id ${id}`);
+      throw new NotFoundException(`No se encontró Perfil`);
     }
     return profile;
   }

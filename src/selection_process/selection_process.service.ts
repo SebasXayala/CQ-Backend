@@ -24,11 +24,7 @@ export class SelectionProcessService {
   }
 
   async findAll() {
-    const results = await this.selectionProcessRepository.find();
-    if (!results || results.length === 0) {
-      throw new NotFoundException('No se encontraron procesos de selección registrados');
-    }
-    return results;
+    return await this.selectionProcessRepository.find();
   }
 
   async findOne(id: number) {
