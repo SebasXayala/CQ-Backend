@@ -24,6 +24,12 @@ export class ListDocumentController {
         return this.listDocumentService.findAll();
     }
 
+    @UseGuards(UserJwtAuthGuard)
+    @Get('profileUser/:profileId')
+    findByProfileUser(@Param('profileId', ParseIntPipe) profileId: number) {
+        return this.listDocumentService.findByProfile(profileId);
+    }
+
     @UseGuards(CandidateJwtAuthGuard)
     @Get('profile/:profileId')
     findByProfile(@Param('profileId', ParseIntPipe) profileId: number) {
