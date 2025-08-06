@@ -8,9 +8,6 @@ export class Document {
     @PrimaryGeneratedColumn()
     id_document: number;
 
-    @Column({ length: 20 })
-    document_type: string;
-
     @Column({ length: 100 })
     document_name: string;
 

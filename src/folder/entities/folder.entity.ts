@@ -17,9 +17,6 @@ export class Folder {
     @Column({ type: 'date' })
     modification_date: Date;
 
-    @Column({ type: 'integer' })
-    id_document: number;
-
     @ManyToOne(() => Candidate, (candidate) => candidate.folder)
     @JoinColumn({ name: 'id_candidate' })
     candidate: Candidate;

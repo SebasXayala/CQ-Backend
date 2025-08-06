@@ -10,11 +10,13 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
-  BadRequestException
+  BadRequestException,
+  UsePipes,
+  ValidationPipe
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentService } from './document.service';
-import { CreateDocumentDto, CreateDocumentWithFileDto } from './dto/create-document.dto';
+import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 
 @Controller('document')
@@ -22,20 +24,21 @@ export class DocumentController {
   constructor(private readonly documentService: DocumentService) { }
 
   @Post()
-  create(@Body() createDocumentDto: CreateDocumentDto) {
-    return this.documentService.create(createDocumentDto);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async createWithFile(
-    @Body() createDocumentDto: CreateDocumentWithFileDto,
+  @UseInterceptors(FileInterceptor('file')) // Solo un archivo
+  @UsePipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: false,
+    transform: true,
+  }))
+  async create(
+    @Body() createDocumentDto: CreateDocumentDto,
     @UploadedFile() file: Express.Multer.File
   ) {
     if (!file) {
       throw new BadRequestException('No se proporcionó ningún archivo');
     }
-    return this.documentService.createWithFile(createDocumentDto, file);
+
+    return this.documentService.create(createDocumentDto, file);
   }
 
   @Get()

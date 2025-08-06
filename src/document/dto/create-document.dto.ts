@@ -1,45 +1,18 @@
-import { IsString, IsNotEmpty, IsNumber, IsDateString, IsOptional, MaxLength } from 'class-validator';
+import {
+    IsNumber,
+    IsDateString,
+    IsOptional,
+    IsNotEmpty
+} from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateDocumentDto {
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(20)
-    document_type: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(100)
-    document_name: string;
-
-    @IsNumber()
-    @IsNotEmpty()
-    id_document_status: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    id_folder: number;
+    @Transform(({ value }) => parseInt(value, 10))
+    @IsNumber({}, { message: 'El id_folder debe ser un número válido' })
+    @IsNotEmpty({ message: 'El id_folder es requerido' })
+    readonly id_folder: number;
 
     @IsOptional()
-    @IsDateString()
-    modification_date?: Date;
-}
-
-// DTO para crear documento con archivo
-export class CreateDocumentWithFileDto {
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(20)
-    document_type: string;
-
-    @IsNumber()
-    @IsNotEmpty()
-    id_document_status: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    id_folder: number;
-
-    @IsOptional()
-    @IsDateString()
-    modification_date?: Date;
+    @IsDateString({}, { message: 'La fecha de modificación debe tener formato ISO válido' })
+    readonly modificationDate?: Date;
 }

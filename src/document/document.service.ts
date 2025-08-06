@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateDocumentDto, CreateDocumentWithFileDto } from './dto/create-document.dto';
+import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { Document } from './entities/document.entity';
 import { DocumentStatus } from '../document_status/entities/document_status.entity';
@@ -20,46 +20,15 @@ export class DocumentService {
     private readonly s3Service: S3Service,
   ) { }
 
-  async create(createDocumentDto: CreateDocumentDto): Promise<Document> {
-    const { document_type, document_name, id_document_status, id_folder, modification_date } = createDocumentDto;
-
-    // Validar que el folder existe
-    const folder = await this.folderRepository.findOne({ where: { id_folder } });
-    if (!folder) {
-      throw new NotFoundException(`No se encontró la carpeta con id ${id_folder}`);
-    }
-
-    // Validar que el estado del documento existe
-    const documentStatus = await this.documentStatusRepository.findOne({ where: { id_document_status } });
-    if (!documentStatus) {
-      throw new NotFoundException(`No se encontró el estado de documento con id ${id_document_status}`);
-    }
-
-    // Validar unicidad de nombre de documento en la misma carpeta
-    const existingDocument = await this.documentRepository.findOne({
-      where: {
-        document_name,
-        id_folder
-      }
-    });
-    if (existingDocument) {
-      throw new ConflictException(`Ya existe un documento con el nombre "${document_name}" en esta carpeta`);
-    }
-
-    const document = this.documentRepository.create({
-      ...createDocumentDto,
-      document_url: '', // URL vacía para documentos creados sin archivo
-      modification_date: modification_date || new Date()
-    });
-
-    return await this.documentRepository.save(document);
-  }
 
   /**
    * Crear documento con archivo subido a S3
    */
-  async createWithFile(createDocumentDto: CreateDocumentWithFileDto, file: Express.Multer.File): Promise<Document> {
-    const { document_type, id_document_status, id_folder, modification_date } = createDocumentDto;
+  async create(createDocumentDto: CreateDocumentDto, file: Express.Multer.File): Promise<Document> {
+    const { id_folder, modificationDate } = createDocumentDto;
+
+    // El estado del documento siempre será 3
+    const id_document_status = 3;
 
     // Validar que el folder existe
     const folder = await this.folderRepository.findOne({ where: { id_folder } });
@@ -67,7 +36,7 @@ export class DocumentService {
       throw new NotFoundException(`No se encontró la carpeta con id ${id_folder}`);
     }
 
-    // Validar que el estado del documento existe
+    // Validar que el estado del documento existe (estado 3)
     const documentStatus = await this.documentStatusRepository.findOne({ where: { id_document_status } });
     if (!documentStatus) {
       throw new NotFoundException(`No se encontró el estado de documento con id ${id_document_status}`);
@@ -94,12 +63,11 @@ export class DocumentService {
 
       // Crear el documento en la base de datos
       const document = this.documentRepository.create({
-        document_type,
         document_name,
         id_document_status,
         id_folder,
         document_url,
-        modification_date: modification_date || new Date()
+        modification_date: modificationDate || new Date()
       });
 
       return await this.documentRepository.save(document);
@@ -132,71 +100,37 @@ export class DocumentService {
     return document;
   }
 
-  async findByFolder(folderId: number): Promise<Document[]> {
-    if (!Number.isInteger(folderId) || folderId <= 0) {
-      throw new BadRequestException('El id de carpeta debe ser un número entero positivo');
+  async findByFolder(id_folder: number): Promise<any> {
+    if (!Number.isInteger(id_folder) || id_folder <= 0) {
+      throw new BadRequestException('El id_folder debe ser un número entero positivo');
     }
 
-    // Verificar que la carpeta existe
-    const folder = await this.folderRepository.findOne({ where: { id_folder: folderId } });
-    if (!folder) {
-      throw new NotFoundException(`No se encontró la carpeta con id ${folderId}`);
-    }
-
-    return await this.documentRepository.find({
-      where: { id_folder: folderId },
-      relations: ['documentStatus', 'folder']
+    const documents = await this.documentRepository.find({
+      where: { id_folder },
+      relations: ['documentStatus', 'folder'],
+      order: { modification_date: 'DESC' }
     });
+
+    return {
+      folder_info: documents[0]?.folder || null,
+      total_documents: documents.length,
+      documents: documents.map(doc => ({
+        id_document: doc.id_document,
+        document_name: doc.document_name,
+        document_url: doc.document_url,
+        modification_date: doc.modification_date,
+        status: {
+          id: doc.documentStatus.id_document_status,
+          name: doc.documentStatus.status,
+          description: doc.documentStatus.description
+        }
+      }))
+    };
   }
 
   async update(id: number, updateDocumentDto: UpdateDocumentDto): Promise<Document> {
-    if (!Number.isInteger(id) || id <= 0) {
-      throw new BadRequestException('El id debe ser un número entero positivo');
-    }
-
-    const document = await this.documentRepository.findOne({ where: { id_document: id } });
-    if (!document) {
-      throw new NotFoundException(`No se encontró el documento con id ${id}`);
-    }
-
-    // Si se actualiza el folder, validar que existe
-    if (updateDocumentDto.id_folder) {
-      const folder = await this.folderRepository.findOne({ where: { id_folder: updateDocumentDto.id_folder } });
-      if (!folder) {
-        throw new NotFoundException(`No se encontró la carpeta con id ${updateDocumentDto.id_folder}`);
-      }
-    }
-
-    // Si se actualiza el estado del documento, validar que existe
-    if (updateDocumentDto.id_document_status) {
-      const documentStatus = await this.documentStatusRepository.findOne({ where: { id_document_status: updateDocumentDto.id_document_status } });
-      if (!documentStatus) {
-        throw new NotFoundException(`No se encontró el estado de documento con id ${updateDocumentDto.id_document_status}`);
-      }
-    }
-
-    // Si se actualiza el nombre, validar unicidad en la carpeta
-    if (updateDocumentDto.document_name && updateDocumentDto.document_name !== document.document_name) {
-      const folderId = updateDocumentDto.id_folder || document.id_folder;
-      const existingDocument = await this.documentRepository.findOne({
-        where: {
-          document_name: updateDocumentDto.document_name,
-          id_folder: folderId
-        }
-      });
-      if (existingDocument && existingDocument.id_document !== id) {
-        throw new ConflictException(`Ya existe un documento con el nombre "${updateDocumentDto.document_name}" en esta carpeta`);
-      }
-    }
-
-    // Actualizar fecha de modificación
-    const updateData = {
-      ...updateDocumentDto,
-      modification_date: new Date()
-    };
-
-    await this.documentRepository.update(id, updateData);
-    return this.findOne(id);
+    // TODO: Implementar método update
+    throw new Error('Método no implementado');
   }
 
   async remove(id: number): Promise<void> {
