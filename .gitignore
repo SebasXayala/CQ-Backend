@@ -1,0 +1,251 @@
+# ===================================
+# COMPILED OUTPUT
+# ===================================
+/dist
+/node_modules
+/build
+*.tsbuildinfo
+
+# ===================================
+# LOGS
+# ===================================
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===================================
+# RUNTIME DATA
+# ===================================
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ===================================
+# DIAGNOSTIC REPORTS
+# ===================================
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ===================================
+# ENVIRONMENT VARIABLES (CRÍTICO)
+# ===================================
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.production
+.env.test
+.env.staging
+
+# ===================================
+# AWS & SERVERLESS (IMPORTANTE)
+# ===================================
+.serverless/
+.aws-sam/
+samconfig.toml
+.amplify/
+aws-exports.js
+awsconfiguration.json
+
+# AWS Credentials (NUNCA commitear)
+.aws/
+aws-credentials
+credentials
+.boto
+.s3cfg
+
+# Lambda deployment packages
+*.zip
+lambda-deployment-*.zip
+
+# CDK
+cdk.out/
+cdk.context.json
+
+# ===================================
+# DOCKER
+# ===================================
+.dockerignore
+docker-compose.override.yml
+*.dockerfile.bak
+
+# ===================================
+# TESTING
+# ===================================
+/coverage
+/coverage-e2e
+/.nyc_output
+/test-results
+/junit.xml
+/e2e-junit.xml
+*.lcov
+
+# Jest
+jest-stare/
+coverage/
+coverage-e2e/
+
+# Test files temporales
+test/test-document.pdf
+test/**/*.pdf
+test/**/*.tmp
+
+# ===================================
+# IDEs and EDITORS
+# ===================================
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# WebStorm/IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ===================================
+# OPERATING SYSTEM
+# ===================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===================================
+# DEPENDENCIES & PACKAGES
+# ===================================
+node_modules/
+jspm_packages/
+bower_components/
+
+# Package locks (mantener solo uno)
+# Si usas npm: mantén package-lock.json, ignora yarn.lock y pnpm-lock.yaml
+# Si usas yarn: mantén yarn.lock, ignora package-lock.json y pnpm-lock.yaml
+# Si usas pnpm: mantén pnpm-lock.yaml, ignora los otros
+# package-lock.json
+# yarn.lock
+
+# ===================================
+# TEMPORARY FILES
+# ===================================
+.temp
+.tmp
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===================================
+# SECURITY & SENSITIVE DATA
+# ===================================
+# SSL certificates
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# API Keys y secrets
+secrets.json
+*.secret
+*secret*
+*credentials*
+*config.local*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# ===================================
+# BUILD TOOLS & BUNDLERS
+# ===================================
+.parcel-cache/
+.cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless_nextjs/
+
+# Webpack
+.webpack/
+
+# Rollup
+.rpt2_cache/
+.rollup.cache/
+
+# ===================================
+# MISC
+# ===================================
+*.tgz
+*.tar.gz
+.npm
+.eslintcache
+.stylelintcache
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache
+.cache
+.parcel-cache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*

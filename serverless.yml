@@ -1,0 +1,82 @@
+service: nestjs-lambda-gh
+
+provider:
+  name: aws
+  region: us-east-2
+  httpApi:
+    cors:
+      allowedOrigins:
+        - 'https://main.d1l70wxl8e697w.amplifyapp.com'
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Amz-User-Agent
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+      allowCredentials: true
+  ecr:
+    images:
+      appimage:
+        path: .
+  environment:
+    NODE_ENV: production
+    DATABASE_URL: postgresql://C4f3c1t4:CQ.1991.c4f32025*@gestionhumana.chgqoo4oaal4.us-east-2.rds.amazonaws.com:5432/postgres?sslmode=require
+    DB_HOST: gestionhumana.chgqoo4oaal4.us-east-2.rds.amazonaws.com
+    DB_PORT: 5432
+    DB_USERNAME: C4f3c1t4
+    DB_PASSWORD: CQ.1991.c4f32025*
+    DB_DATABASE: postgres
+    DB_SSL: true
+    JWT_SECRET_USER: 8f14e45f-efb8-479f-b57c-4a1a1e6e1f1e
+    JWT_SECRET_CANDIDATE: a7b9c4d2-e8f1-g3h5-i6j7-k8l9m0n1o2p3
+    JWT_EXPIRES_IN_USER: 7d
+    JWT_EXPIRES_IN_CANDIDATE: 24h
+    AWS_S3_BUCKET_NAME: bucket-documentos-gestionhumana-cq2025
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:DeleteObject
+            - s3:AbortMultipartUpload
+          Resource: arn:aws:s3:::bucket-documentos-gestionhumana-cq2025/*
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: arn:aws:s3:::bucket-documentos-gestionhumana-cq2025
+
+functions:
+  api:
+    # Para producción usa imagen Docker
+    image:
+      name: appimage
+      command:
+        - dist/lambda.handler
+    # Para desarrollo local usa el código directamente (comentar image, descomentar handler)
+    # handler: dist/lambda.handler
+    # runtime: nodejs20.x
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3001
+    host: 0.0.0.0
+    stage: dev

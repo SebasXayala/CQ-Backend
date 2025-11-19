@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # PostgreSQL para testing
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: cq-backend-postgres-test
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: cq_backend_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U test_user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Jenkins para CI/CD
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: cq-backend-jenkins
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+
+  # LocalStack para simular AWS S3 (opcional)
+  localstack:
+    image: localstack/localstack:latest
+    container_name: cq-backend-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - localstack-data:/tmp/localstack
+
+volumes:
+  postgres-test-data:
+  jenkins-data:
+  localstack-data:
